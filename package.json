@@ -1,0 +1,23 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "danfojs": "^1.1.1",
+    "elementtree": "^0.1.7",
+    "pandas-js": "^0.2.4",
+    "papaparse": "^5.3.2",
+    "vue": "^3.2.25",
+    "xmlbuilder2": "^3.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "vite": "^2.9.5"
+  }
+}
