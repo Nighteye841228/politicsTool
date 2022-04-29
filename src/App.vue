@@ -1,13 +1,18 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Vite 史料庫上傳工具" />
+  <img alt="Vue logo" src="./assets/logo.png">
+  <HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
+
+<script>
+import HelloWorld from './components/HelloWorld.vue'
+
+export default {
+  name: 'App',
+  components: {
+    HelloWorld
+  }
+}
+</script>
 
 <style>
 #app {

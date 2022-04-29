@@ -22,15 +22,16 @@ a {
 
 <script setup>
 import { ref } from "vue";
-import * as dfd from "danfojs";
+import { DataFrame, toJSON as ts} from "danfojs";
 import { create } from "xmlbuilder2";
 import csv from "csvtojson";
 
+/* global defineProps */
 defineProps({
   msg: String,
 });
 
-let count = ref(0);
+
 let sample = ref("");
 let finalXML = ref("");
 let account = ref("");
@@ -62,11 +63,12 @@ let meta_dic = {
 };
 
 const timeNow = new Date();
-const corpusName = String(`我的文獻集_${timeNow.toLocaleString()}`).replace(/[\/\s]/g, '_');
+const corpusName = String(`我的文獻集_${timeNow.toLocaleString()}`).replace(/[/\s]/g, '_');
 
 
 
 async function csvTrans() {
+  console.log('1')
   let waitToTransCsvString = sample.value
   .replace(/^.*\n.*\n.*\n/g, '')
   .replace(/"\t*"/g, '')
@@ -79,15 +81,17 @@ async function csvTrans() {
 
 
 async function transData() {
-  let df = new dfd.DataFrame(waitToTrans.value);
-  df.fillNa('""');
 
+  let df = new DataFrame(waitToTrans.value);
+  
+  df.fillNa('""');
+  console.log(df)
   // # 資料來源、文獻類型合併
   // df['刊物'] = df['資料來源'] + df['文獻類型']
   df.addColumn("刊物", df["資料來源"].str.concat(df["文獻類型"].values, 1), {
     inplace: true,
   });
-
+  console.log('wwwwwwwwwww')
   // // // # 類別、主題類別合併
   // df['類別'] = df['類別'] + ';' + df['主題分類']
   let sss = df["主題分類"].map((x) => {
@@ -171,7 +175,8 @@ async function transData() {
     ],
     inplace: true,
   });
-  transJSON.value = dfd.toJSON(df);
+  transJSON.value = ts(df);
+  
   await outXML();
 }
 
@@ -244,7 +249,7 @@ async function outXML() {
 }
 
 function login() {
-  if (!account || !password) {
+  if (!account.value || !password.value) {
     fail();
     return;
   }
@@ -277,6 +282,7 @@ async function uploadXML() {
       name: "importedFiles[]",
     },
   };
+  console.log('4')
   // eslint-disable-next-line
   docuskyManageDbListSimpleUI.uploadMultipart(
     formData,
