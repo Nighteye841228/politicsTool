@@ -5,7 +5,7 @@
   <p>
     請將csv原始碼貼上底下空格
   </p>
-  <a href="https://docusky.org.tw/DocuSky/docuTools/userMain/">DocuSky</a>
+  <a href="https://docusky.org.tw/DocuSky/docuTools/userMain/" target="_blank">DocuSky</a>
   帳號<input type="text" v-model="account">
   密碼<input type="password" v-model="password">
   <button @click="login">登入</button>
