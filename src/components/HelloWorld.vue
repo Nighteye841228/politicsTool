@@ -264,8 +264,8 @@ function login() {
   }
 }
 
-async function uploadXML() {
-  await csvTrans();
+function uploadXML() {
+  csvTrans();
   let formData = {
     dummy: {
       name: "dbTitleForImport",
@@ -278,7 +278,7 @@ async function uploadXML() {
     },
   };
   // eslint-disable-next-line
-  await docuskyManageDbListSimpleUI.uploadMultipart(
+  docuskyManageDbListSimpleUI.uploadMultipart(
     formData,
     function () {
       alert("上傳成功!");
