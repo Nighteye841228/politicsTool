@@ -74,11 +74,11 @@ async function csvTrans() {
   .replace(/=/g, '')
 
   waitToTrans.value = await csv().fromString(waitToTransCsvString)
-  transData();
+  await transData();
 }
 
 
-function transData() {
+async function transData() {
   let df = new dfd.DataFrame(waitToTrans.value);
   df.fillNa('""');
 
@@ -172,10 +172,10 @@ function transData() {
     inplace: true,
   });
   transJSON.value = dfd.toJSON(df);
-  outXML();
+  await outXML();
 }
 
-function outXML() {
+async function outXML() {
   
   let politicJSON = transJSON.value;
   let fileNum = Math.ceil(Math.log10(politicJSON.length));
@@ -264,8 +264,8 @@ function login() {
   }
 }
 
-function uploadXML() {
-  csvTrans();
+async function uploadXML() {
+  await csvTrans();
   let formData = {
     dummy: {
       name: "dbTitleForImport",
@@ -280,10 +280,10 @@ function uploadXML() {
   // eslint-disable-next-line
   docuskyManageDbListSimpleUI.uploadMultipart(
     formData,
-    function () {
+    await function () {
       alert("上傳成功!");
     },
-    function () {
+    await function () {
       alert("失敗，請重試或檢查是否檔案錯誤");
     }
   );
