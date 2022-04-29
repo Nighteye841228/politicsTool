@@ -264,9 +264,8 @@ function login() {
   }
 }
 
-function uploadXML() {
-  csvTrans();
-  console.log(finalXML.value)
+async function uploadXML() {
+  await csvTrans();
   let formData = {
     dummy: {
       name: "dbTitleForImport",
@@ -279,7 +278,7 @@ function uploadXML() {
     },
   };
   // eslint-disable-next-line
-  docuskyManageDbListSimpleUI.uploadMultipart(
+  await docuskyManageDbListSimpleUI.uploadMultipart(
     formData,
     function () {
       alert("上傳成功!");
