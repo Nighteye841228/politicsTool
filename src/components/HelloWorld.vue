@@ -137,7 +137,7 @@ async function transData() {
   df.addColumn(
     "會議開始日期",
     df["會議日期"].map((x) => {
-      if (!x.match(/\d/)) return "";
+      if (!x.match(/\d/)) return "99990000";
 
       if (x.match(/~/)) {
         x = x.replace(/(^[^~]*).*/, "$1").trim();
@@ -148,13 +148,27 @@ async function transData() {
   );
 
   df.addColumn(
-    "會議結束日期",
+    "會議開始日期_AD",
     df["會議日期"].map((x) => {
       if (!x.match(/\d/)) return "";
 
       if (x.match(/~/)) {
-        console.log("ssss", x);
-        x = x.replace(/.*([^~]*)$/g, "$1").trim();
+        x = x.replace(/(^[^~]*).*/, "$1").trim();
+      }
+      return String(x).replace(/(\d{4}).*/g, "$1");
+    }),
+    { inplace: true }
+  );
+
+  df.addColumn(
+    "會議結束日期",
+    df["會議日期"].map((x) => {
+      if (!x.match(/\d/)) return "99990000";
+
+      if (x.match(/~/)) {
+        console.log("BE", x);
+        x = x.replace(/(.*)~/g, "").trim();
+        console.log("AF", x);
       }
       return String(x).replace(/\//g, "");
     }),
