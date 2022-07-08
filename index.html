@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="icon" href="/politicsTool/favicon.ico"/><title>govite</title><script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://docusky.org.tw/DocuSky/js/jquery.min.js"></script><script src="https://docusky.org.tw/DocuSky/js.ui/docusky.ui.manageDbListSimpleUI.js"></script><script src="https://docusky.org.tw/DocuSky/js.ui/docusky.ui.getDbCorpusDocumentsSimpleUI.js"></script><script src="https://docusky.org.tw/DocuSky/js.ui/docusky.ui.manageDataFileListSimpleUI.js"></script><script src="https://cdn.jsdelivr.net/npm/xmlbuilder2/lib/xmlbuilder2.min.js"></script><script defer="defer" src="/politicsTool/js/chunk-vendors.fec6488d.js"></script><script defer="defer" src="/politicsTool/js/app.b91edafd.js"></script><link href="/politicsTool/css/app.74429bd5.css" rel="stylesheet"></head><body><noscript><strong>We're sorry but govite doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div></body><script>var docuSkyDbObj = null;
+    var docuSkyGetDocsObj = null;
+    var docuSkyDataFilesObj = null;
+
+    $(document).ready(function () {
+      docuSkyDbObj = docuskyManageDbListSimpleUI;
+      docuSkyGetDocsObj = docuskyGetDbCorpusDocumentsSimpleUI;
+      docuSkyDataFilesObj = docuskyManageDataFileListSimpleUI;
+
+      docuSkyDbObj.includeFriendDb = true;
+      docuSkyGetDocsObj.includeFriendDb = true;
+
+      $("#manageDbList").click(function (e) {
+        docuSkyDbObj.manageDbList(e);
+      });
+
+      $("#getDocuSkyDocs").click(function (e) {
+        docuSkyGetDocsObj.getDbCorpusDocuments("", "", "", e);
+      });
+
+      $("#manageDataFiles").click(function (e) {
+        docuSkyDataFilesObj.manageDataFileList(e);
+      });
+    });</script></html>
