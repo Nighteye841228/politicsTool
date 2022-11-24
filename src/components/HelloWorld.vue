@@ -1,28 +1,70 @@
 <template>
-  <h1>{{ msg }}</h1>
+  <div class="container grid grid-cols-5 justify-center gap-4 font-serif">
+    <img
+      class="col-span-3 col-start-2 justify-self-center"
+      alt="Vue logo"
+      src="../assets/logo.png"
+    />
+    <h1 class="col-span-1 col-start-3 text-xl">{{ msg }}</h1>
 
-  
-  <p>
-    請將csv原始碼貼上底下空格
-  </p>
-  <a href="https://docusky.org.tw/DocuSky/docuTools/userMain/" target="_blank">DocuSky</a>
-  帳號<input type="text" v-model="account">
-  密碼<input type="password" v-model="password">
-  <button @click="login">登入</button>
-  <button @click="uploadXML">上傳</button>
-  <br />
-  <textarea style="width:50em;height:20em;" placeholder="csv原始碼" v-model="sample"></textarea>
+    <a
+      href="https://docusky.org.tw/DocuSky/docuTools/userMain/"
+      class="col-span-1 col-start-3 bg-red-50 text-blue-500 hover:bg-red-100 text-center"
+      target="_blank"
+      >DocuSky官網</a
+    >
+    <span class="bg-gray-50 col-start-2 col-span-1 py-2">帳號</span>
+    <input
+      type="text"
+      v-model="account"
+      class="bg-green-50 col-start-3 col-span-2 py-2"
+    />
+    <span class="bg-gray-50 col-start-2 col-span-1 py-2">密碼</span>
+    <input
+      type="password"
+      class="bg-green-50 col-start-3 col-span-2 py-2"
+      v-model="password"
+    />
+    <button
+      class="col-span-3 col-start-2 bg-red-50 hover:bg-red-100 rounded-md py-2"
+      @click="login"
+    >
+      登入
+    </button>
+    <span class="bg-gray-50 col-start-2 col-span-1 py-2">文獻集名稱</span>
+    <input
+      class="bg-green-50 col-start-3 col-span-2 hover:bg-green-100 py-2"
+      type="text"
+      v-model="corpus"
+      :placeholder="'自訂名稱'"
+    />
+
+    <input
+      class="bg-green-50 col-start-2 col-span-3"
+      type="file"
+      ref="file"
+      @change="readFile()"
+    />
+    <button
+      class="col-span-3 col-start-2 bg-red-50 hover:bg-red-100 rounded-md py-2"
+      @click="uploadXML"
+    >
+      上傳
+    </button>
+    <textarea
+      rows="50"
+      class="col-span-3 col-start-2 bg-green-50 hover:bg-green-100"
+      placeholder="可直接在此貼上csv原始碼，或將從政府檔案庫收藏下載的檔案上傳"
+      v-model="sample"
+    ></textarea>
+  </div>
 </template>
 
-<style scoped>
-a {
-  color: #42b983;
-}
-</style>
+<style scoped></style>
 
 <script setup>
-import { ref } from "vue";
-import { DataFrame, toJSON as ts} from "danfojs";
+import { ref, computed } from "vue";
+import { DataFrame, toJSON as ts } from "danfojs";
 import { create } from "xmlbuilder2";
 import csv from "csvtojson";
 
@@ -31,13 +73,25 @@ defineProps({
   msg: String,
 });
 
+const sample = ref("");
+const finalXML = ref("");
+const account = ref("");
+const password = ref("");
+const waitToTrans = ref("");
+const corpus = ref("");
+const transJSON = ref({});
 
-let sample = ref("");
-let finalXML = ref("");
-let account = ref("");
-let password = ref("");
-let waitToTrans = ref("");
-let transJSON = ref({});
+const file = ref(null);
+const readFile = () => {
+  let csvString = file.value.files[0];
+  const reader = new FileReader();
+  reader.onload = async (res) => {
+    let temp = res.target.result;
+    sample.value = temp;
+  };
+  reader.onerror = (err) => console.log(err);
+  reader.readAsText(csvString);
+};
 
 let meta_dic = {
   題名: "title",
@@ -63,35 +117,36 @@ let meta_dic = {
 };
 
 const timeNow = new Date();
-const corpusName = String(`我的文獻集_${timeNow.toLocaleString()}`).replace(/[/\s]/g, '_');
-
-
+const corpusName = computed(() => {
+  return String(`${corpus.value}_${timeNow.toLocaleString()}`).replace(
+    /[/\s]/g,
+    "_"
+  );
+});
 
 async function csvTrans() {
-  console.log('1')
+  //console.log("1");
   let waitToTransCsvString = sample.value
-  .replace(/^.*\n.*\n.*\n/g, '')
-  .replace(/"\t*"/g, '')
-  .replace(/\t/g, ',')
-  .replace(/=/g, '')
+    .replace(/^.*\n.*\n.*\n/g, "")
+    .replace(/"\t*"/g, "")
+    .replace(/\t/g, ",")
+    .replace(/=/g, "");
 
-  waitToTrans.value = await csv().fromString(waitToTransCsvString)
+  waitToTrans.value = await csv().fromString(waitToTransCsvString);
   await transData();
 }
 
-
 async function transData() {
-
   let df = new DataFrame(waitToTrans.value);
-  
+
   df.fillNa('""');
-  console.log(df)
+  //console.log(df);
   // # 資料來源、文獻類型合併
   // df['刊物'] = df['資料來源'] + df['文獻類型']
   df.addColumn("刊物", df["資料來源"].str.concat(df["文獻類型"].values, 1), {
     inplace: true,
   });
-  console.log('wwwwwwwwwww')
+  //console.log("wwwwwwwwwww");
   // // // # 類別、主題類別合併
   // df['類別'] = df['類別'] + ';' + df['主題分類']
   let sss = df["主題分類"].map((x) => {
@@ -149,8 +204,14 @@ async function transData() {
 
   df.addColumn(
     "會議開始日期_AD",
-    df["會議日期"].map((x) => {
-      if (!x.match(/\d/)) return "";
+    df["會議日期"].map((x, ind) => {
+      if (!x.match(/\d/)) {
+        if (df["出版日期新"].getColumnData[ind].match(/\d/)) {
+          x = String(df["出版日期新"].getColumnData[ind]);
+        } else {
+          return "";
+        }
+      }
 
       if (x.match(/~/)) {
         x = x.replace(/(^[^~]*).*/, "$1").trim();
@@ -166,9 +227,9 @@ async function transData() {
       if (!x.match(/\d/)) return "99990000";
 
       if (x.match(/~/)) {
-        console.log("BE", x);
+        //console.log("BE", x);
         x = x.replace(/(.*)~/g, "").trim();
-        console.log("AF", x);
+        //console.log("AF", x);
       }
       return String(x).replace(/\//g, "");
     }),
@@ -190,19 +251,18 @@ async function transData() {
     inplace: true,
   });
   transJSON.value = ts(df);
-  
+
   await outXML();
 }
 
 async function outXML() {
-  
   let politicJSON = transJSON.value;
   let fileNum = Math.ceil(Math.log10(politicJSON.length));
   // console.log(fileNum)
 
   let root = create({ version: "1.0" }).ele("ThdlPrototypeExport");
   let corpus = root.ele("corpus", {
-    name: corpusName,
+    name: corpusName.value,
   });
   let metadata_field_settings = corpus.ele("metadata_field_settings");
   for (let key in meta_dic) {
@@ -233,7 +293,7 @@ async function outXML() {
     let document = documents.ele("document", {
       filename: `${padding(index, fileNum)}`,
     });
-    document.ele('corpus').txt(corpusName);
+    document.ele("corpus").txt(corpusName.value);
     for (let key in article) {
       if (key === "docclass" || key === "quote_format") {
         continue;
@@ -244,7 +304,7 @@ async function outXML() {
       }
     }
 
-    let xml_metadata = document.ele('xml_metadata')
+    let xml_metadata = document.ele("xml_metadata");
     for (let key in article) {
       if (key !== "doc_content") {
         xml_metadata.ele(key).txt(article[key]);
@@ -255,7 +315,10 @@ async function outXML() {
     article["docclass"].split(";").forEach((x) => {
       metatag.ele("Udef_article_category").txt(x);
     });
-    doc_content.ele("Comment").ele("CommentItem", {'Category': '引用格式'}).txt(article["quote_format"]);
+    doc_content
+      .ele("Comment")
+      .ele("CommentItem", { Category: "引用格式" })
+      .txt(article["quote_format"]);
   });
 
   console.log(root.end({ prettyPrint: true }));
@@ -288,15 +351,15 @@ async function uploadXML() {
   let formData = {
     dummy: {
       name: "dbTitleForImport",
-      value: corpusName,
+      value: corpusName.value,
     },
     file: {
       value: finalXML.value,
-      filename: 'corpusName' + ".xml",
+      filename: "corpusName" + ".xml",
       name: "importedFiles[]",
     },
   };
-  console.log('4')
+  //console.log("4");
   // eslint-disable-next-line
   docuskyManageDbListSimpleUI.uploadMultipart(
     formData,
